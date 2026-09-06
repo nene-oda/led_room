@@ -1,0 +1,19 @@
+# Normalizacion de fin de linea: el repositorio se desarrolla en Windows pero
+# se construye y ejecuta en contenedores Linux. LF en el repositorio evita que
+# los scripts copiados a la imagen lleguen con CRLF.
+* text=auto eol=lf
+
+# Binarios: nunca normalizar.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.db binary
+*.sqlite binary
+*.sqlite3 binary
+
+# Lockfiles: generados, colapsar en diffs y no marcar conflictos manuales.
+package-lock.json -diff linguist-generated

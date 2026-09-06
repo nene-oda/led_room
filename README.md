@@ -241,9 +241,9 @@ led-room/
 ├── .gitignore
 ├── .env.example
 │
+├── pyproject.toml          ← en la RAÍZ (ver ARCHITECTURE.md §5.1)
+│
 ├── backend/
-│   │
-│   ├── pyproject.toml
 │   │
 │   ├── app/
 │   │   ├── main.py
@@ -1094,15 +1094,19 @@ ENV LED_ROOM_FRONTEND=/app/frontend
 
 EXPOSE 8000
 
-CMD [
-  "uvicorn",
-  "backend.app.main:app",
-  "--host",
-  "0.0.0.0",
-  "--port",
-  "8000"
-]
+CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
+
+> **Nota de implementación.** El `Dockerfile` real difiere de este boceto en
+> tres puntos, documentados con su razón en `ARCHITECTURE.md` §5:
+>
+> 1. `pip install -e /app/backend` **no** produce un paquete importable como
+>    `backend.app`. El `pyproject.toml` vive en la raíz del repositorio y la
+>    instalación se hace desde ahí.
+> 2. No se instalan `bluetooth`, `bluez` ni `dbus`: Bleak habla D-Bus contra el
+>    bus del sistema del host con una biblioteca de Python puro. Ahorra ~100 MB.
+> 3. El `CMD` real usa `sh -c` con `exec`, para expandir `LED_ROOM_HOST` y
+>    `LED_ROOM_PORT` y que uvicorn quede como PID 1 y reciba `SIGTERM`.
 
 ---
 
@@ -1184,6 +1188,23 @@ Ejecutar:
 ```bash
 docker compose up -d
 ```
+
+> **Nota de implementación.** `network_mode: host` solo tiene semántica útil en
+> Linux; en Docker Desktop no expone la red del host y además es incompatible
+> con `ports`. Por eso la implementación reparte esto en dos archivos:
+>
+> - `docker-compose.yml` — portable, publica el puerto 8000. Funciona en
+>   cualquier sistema, incluido Windows.
+> - `compose.bluetooth.yml` — override para Linux y Raspberry Pi, que añade
+>   `network_mode: host` y el montaje del bus del sistema.
+>
+> ```bash
+> # En cualquier sistema
+> docker compose up -d
+>
+> # En Linux / Raspberry Pi, con acceso al Bluetooth del host
+> docker compose -f docker-compose.yml -f compose.bluetooth.yml up -d
+> ```
 
 ---
 
@@ -1271,6 +1292,13 @@ LED_ROOM_PORT=8000
 
 LED_ROOM_DATABASE=/data/led-room.db
 
+# Ruta de los estáticos del SPA que sirve FastAPI.
+LED_ROOM_FRONTEND=/app/frontend
+
+# Implementación de LightDevicePort: null | lotus_lantern
+# "null" no toca hardware y permite arrancar en cualquier host.
+LED_ROOM_DEVICE_ADAPTER=null
+
 LED_ROOM_DEVICE_NAME=ELK-BLEDOM
 
 LED_ROOM_BLE_SCAN_TIMEOUT=10
@@ -1279,6 +1307,11 @@ LED_ROOM_EFFECT_FPS=20
 
 LED_ROOM_LOG_LEVEL=INFO
 ```
+
+`LED_ROOM_FRONTEND` y `LED_ROOM_DEVICE_ADAPTER` no estaban en el plan original;
+el empaquetado los necesita. Fuera del contenedor, la base de datos y los
+estáticos tienen valores por defecto **relativos al repositorio**, para que el
+backend nativo funcione en Windows, donde `/data` no existe.
 
 ---
 
