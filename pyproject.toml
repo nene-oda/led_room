@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "led-room-backend"
+version = "0.1.0"
+description = "LED Room Controller backend (FastAPI + BLE)"
+requires-python = ">=3.13"
+license = "GPL-3.0-or-later"
+
+dependencies = [
+  "fastapi>=0.141,<1.0",
+  "uvicorn[standard]>=0.52,<1.0",
+  "pydantic>=2.13,<3.0",
+  "pydantic-settings>=2.15,<3.0",
+  "sqlmodel>=0.0.42,<0.1",
+  "alembic>=1.19,<2.0",
+  "bleak>=3.0,<4.0",
+  "websockets>=17.1,<18.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=9.1,<10.0",
+  "pytest-asyncio>=1.4,<2.0",
+  "httpx>=0.28,<1.0",
+  "ruff>=0.16,<0.17",
+  "mypy>=2.3,<3.0",
+]
+
+# El pyproject.toml vive en la raiz (no en backend/) a proposito: es la unica
+# configuracion que hace que `backend.app` sea importable tanto en modo editable
+# como en un wheel, y que descubra los subpaquetes de forma recursiva.
+# Ver design.md D1.
+[tool.setuptools.packages.find]
+include = ["backend*"]
+exclude = ["backend.tests*"]
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+asyncio_mode = "strict"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+# El README contiene bloques de codigo Python ilustrativos que no deben
+# reformatearse: son la especificacion, no codigo del proyecto.
+extend-exclude = ["*.md", ".venv", "frontend"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "ASYNC", "SIM", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+# Migraciones generadas por `alembic revision --autogenerate`. Se revisan a
+# mano, pero no se reformatean: el ruido de un reformateo esconde el cambio
+# real de esquema en el diff.
+"alembic/versions/*.py" = ["E501", "W291", "I001"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["backend"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+warn_unreachable = true
+plugins = ["pydantic.mypy"]
+packages = ["backend"]
+
+[[tool.mypy.overrides]]
+module = ["backend.tests.*"]
+disallow_untyped_defs = false

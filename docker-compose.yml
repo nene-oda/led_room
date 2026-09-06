@@ -1,0 +1,67 @@
+# Composicion portable: funciona en Linux, Windows y macOS.
+#
+# Para dar acceso al Bluetooth del host en Linux / Raspberry Pi, superponer
+# compose.bluetooth.yml:
+#   docker compose -f docker-compose.yml -f compose.bluetooth.yml up -d
+name: led-room
+
+services:
+  led-room:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        LED_ROOM_UID: "${LED_ROOM_UID:-10001}"
+        LED_ROOM_GID: "${LED_ROOM_GID:-10001}"
+    image: ${LED_ROOM_IMAGE:-led-room:latest}
+    container_name: led-room
+    restart: unless-stopped
+
+    # Publicacion de puertos en vez de network_mode: host, porque host solo
+    # tiene semantica util en Linux y romperia esta composicion en Docker
+    # Desktop. El override de Bluetooth la cambia. Ver design.md D7.
+    ports:
+      - "${LED_ROOM_PORT:-8000}:8000"
+
+    volumes:
+      - ./data:/data
+
+    environment:
+      LED_ROOM_HOST: 0.0.0.0
+      LED_ROOM_PORT: 8000
+      LED_ROOM_DATABASE: /data/led-room.db
+      # 1 = aplicar 'alembic upgrade head' al arrancar (por defecto).
+      # 0 = arrancar sin migrar, para inspeccionar un volumen danado.
+      LED_ROOM_MIGRATE: ${LED_ROOM_MIGRATE:-1}
+      LED_ROOM_FRONTEND: /app/frontend
+      LED_ROOM_DEVICE_ADAPTER: ${LED_ROOM_DEVICE_ADAPTER:-null}
+      LED_ROOM_DEVICE_NAME: ${LED_ROOM_DEVICE_NAME:-}
+      LED_ROOM_BLE_SCAN_TIMEOUT: ${LED_ROOM_BLE_SCAN_TIMEOUT:-10}
+      LED_ROOM_EFFECT_FPS: ${LED_ROOM_EFFECT_FPS:-20}
+      LED_ROOM_LOG_LEVEL: ${LED_ROOM_LOG_LEVEL:-INFO}
+
+    # Debe coincidir con el propietario del bind mount ./data.
+    user: "${LED_ROOM_UID:-10001}:${LED_ROOM_GID:-10001}"
+
+    security_opt:
+      - no-new-privileges:true
+
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=3)
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      # El arranque incluye ahora la migracion del esquema.
+      start_period: 30s
+
+    stop_grace_period: 10s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

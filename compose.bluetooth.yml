@@ -1,0 +1,36 @@
+# Override para Linux y Raspberry Pi: da al contenedor acceso al Bluetooth
+# del host y lo expone directamente en la red local.
+#
+#   docker compose -f docker-compose.yml -f compose.bluetooth.yml up -d
+#
+# NO funciona en Windows ni macOS: Docker Desktop ejecuta los contenedores en
+# una VM sin radio Bluetooth, y network_mode: host no expone la red del host.
+# Ahi la ruta soportada es ejecutar el backend de forma nativa (README 25).
+services:
+  led-room:
+    # Expone el servidor en la LAN sin NAT. Incompatible con `ports`, que se
+    # anula aqui.
+    network_mode: host
+    ports: !reset []
+
+    volumes:
+      # Bus del sistema del host: es el requisito real del backend BlueZ de
+      # Bleak. Debe montarse en lectura y escritura — connect() sobre un socket
+      # Unix necesita permiso de escritura y en :ro falla con EACCES.
+      - /run/dbus:/run/dbus
+      - ./data:/data
+
+    environment:
+      LED_ROOM_DEVICE_ADAPTER: ${LED_ROOM_DEVICE_ADAPTER:-null}
+
+    # Si la politica de D-Bus del host exige pertenecer al grupo bluetooth:
+    #   echo "LED_ROOM_BLUETOOTH_GID=$(getent group bluetooth | cut -d: -f3)" >> .env
+    group_add:
+      - "${LED_ROOM_BLUETOOTH_GID:-10001}"
+
+    # En arm64 (Raspberry Pi) importar alembic y SQLAlchemy y aplicar las diez
+    # tablas tarda bastante mas que en x86_64. Se amplia el periodo de gracia
+    # para que el contenedor no aparezca 'unhealthy' durante el primer arranque,
+    # que es el unico que crea el esquema completo.
+    healthcheck:
+      start_period: 45s
