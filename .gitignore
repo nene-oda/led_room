@@ -334,3 +334,16 @@ pipenv.lock.bak
 .pipenv-shims/
 .python-version
 requirements.txt.lock
+
+
+### Claude ###
+# claude specific files
+.claude/
+.claude/*
+CLAUDE_AGENTS.md
+CLAUDE.md
+
+### Opens Spec ###
+# openspec specific files
+openspec/
+openspec/*
