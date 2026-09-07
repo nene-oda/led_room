@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from backend.app.domain.devices.models import DeviceCapabilities
+from backend.app.domain.devices.models import DeviceCapabilities, DeviceTarget
 from backend.app.domain.lighting import BRIGHTNESS_MAX, BRIGHTNESS_MIN, LightFrame
 
 
@@ -29,7 +29,7 @@ class BaseLightDevice(ABC):
     def is_connected(self) -> bool: ...
 
     @abstractmethod
-    async def connect(self) -> None: ...
+    async def connect(self, target: DeviceTarget) -> None: ...
 
     @abstractmethod
     async def disconnect(self) -> None: ...

@@ -8,7 +8,11 @@ from __future__ import annotations
 
 import logging
 
-from backend.app.domain.devices.models import SINGLE_COLOR_STRIP, DeviceCapabilities
+from backend.app.domain.devices.models import (
+    SINGLE_COLOR_STRIP,
+    DeviceCapabilities,
+    DeviceTarget,
+)
 from backend.app.domain.lighting import RGBColor
 from backend.app.infrastructure.devices.base import BaseLightDevice
 
@@ -21,6 +25,7 @@ class NullLightDeviceAdapter(BaseLightDevice):
     def __init__(self, capabilities: DeviceCapabilities | None = None) -> None:
         super().__init__(capabilities or SINGLE_COLOR_STRIP)
         self._connected = False
+        self._target: DeviceTarget | None = None
         self._power = False
         self._color = RGBColor(r=0, g=0, b=0)
         self._brightness = 0
@@ -28,6 +33,11 @@ class NullLightDeviceAdapter(BaseLightDevice):
     @property
     def is_connected(self) -> bool:
         return self._connected
+
+    @property
+    def target(self) -> DeviceTarget | None:
+        """Ultimo destino con el que se abrio el enlace. Inspeccionable en los tests."""
+        return self._target
 
     @property
     def power(self) -> bool:
@@ -41,12 +51,17 @@ class NullLightDeviceAdapter(BaseLightDevice):
     def brightness(self) -> int:
         return self._brightness
 
-    async def connect(self) -> None:
+    async def connect(self, target: DeviceTarget) -> None:
         self._connected = True
-        logger.info("Dispositivo sin hardware conectado (no se toca ninguna radio)")
+        self._target = target
+        logger.info(
+            "Dispositivo sin hardware conectado a %s (no se toca ninguna radio)",
+            target.address,
+        )
 
     async def disconnect(self) -> None:
         self._connected = False
+        self._target = None
         logger.info("Dispositivo sin hardware desconectado")
 
     async def set_power(self, value: bool) -> None:
