@@ -1,0 +1,56 @@
+/* El padding, no el tamano de la pista, es lo que garantiza el objetivo tactil:
+   la pista mide 24px de alto y la zona pulsable 44px. */
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--touch-target);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-muted);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.toggle:disabled {
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
+}
+
+.label {
+  font-size: 0.875rem;
+}
+
+.track {
+  position: relative;
+  flex: none;
+  width: calc(var(--space-5) * 2);
+  height: var(--space-5);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-muted);
+  transition: background-color var(--duration-fast) ease;
+}
+
+.knob {
+  position: absolute;
+  top: var(--space-1);
+  left: var(--space-1);
+  width: calc(var(--space-5) - var(--space-2));
+  height: calc(var(--space-5) - var(--space-2));
+  border-radius: var(--radius-pill);
+  background-color: var(--color-surface);
+  transition: transform var(--duration-fast) ease;
+}
+
+.toggle[aria-checked='true'] .track {
+  background-color: var(--color-accent);
+}
+
+.toggle[aria-checked='true'] .knob {
+  transform: translateX(var(--space-5));
+}

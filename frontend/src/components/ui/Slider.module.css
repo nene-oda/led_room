@@ -1,0 +1,72 @@
+.slider {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.label {
+  font-size: 0.875rem;
+}
+
+.value {
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  opacity: var(--opacity-muted);
+}
+
+/* La altura del control ES la zona activa: el pulgar puede desviarse
+   verticalmente sin soltar el arrastre aunque la barra sea fina. */
+.input {
+  width: 100%;
+  min-height: var(--touch-target);
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.input:disabled {
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
+}
+
+.input::-webkit-slider-runnable-track {
+  height: var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-muted);
+}
+
+.input::-moz-range-track {
+  height: var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-muted);
+}
+
+.input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: var(--space-5);
+  height: var(--space-5);
+  /* Centra el pulgar sobre la pista: (alto de pista - alto del pulgar) / 2. */
+  margin-top: calc((var(--space-2) - var(--space-5)) / 2);
+  border: 2px solid var(--color-surface);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+}
+
+.input::-moz-range-thumb {
+  width: var(--space-5);
+  height: var(--space-5);
+  border: 2px solid var(--color-surface);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+}

@@ -1,0 +1,87 @@
+/* Cromo del dialogo modal. El centrado, la capa superior y el bloqueo de la
+   interaccion con el fondo los pone el navegador con `showModal()`; aqui solo
+   quedan el tamaño, el desplazamiento interno y el fondo oscurecido.
+
+   Todos los valores salen de los tokens de index.css. */
+.dialog {
+  /* Sin relleno propio: cualquier clic que aterrice en el <dialog> es fondo, y
+     eso es lo que distingue el cierre por fondo del clic en el contenido. */
+  padding: 0;
+  width: min(100% - 2 * var(--space-4), 34rem);
+  max-height: min(90dvh, 48rem);
+  overflow: hidden;
+  border: 1px solid var(--color-muted);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+/* `[open]` y no `.dialog` a secas: el `display` de autor gana a la regla
+   `dialog:not([open]) { display: none }` del navegador, y una hoja que la pise
+   dejaria el dialogo visible si alguna vez se renderizara cerrado. */
+.dialog[open] {
+  display: block;
+}
+
+.dialog::backdrop {
+  background-color: rgb(0 0 0 / 0.55);
+}
+
+/* La cabecera queda fija y solo rueda el cuerpo: en un movil, un editor largo
+   dejaria el titulo y la X fuera de la pantalla. */
+.panel {
+  display: flex;
+  flex-direction: column;
+  max-height: min(90dvh, 48rem);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--color-muted);
+}
+
+.title {
+  margin: 0;
+  font-size: 1rem;
+  text-transform: none;
+  letter-spacing: normal;
+  opacity: 1;
+}
+
+.close {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--touch-target);
+  min-height: var(--touch-target);
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.close:hover {
+  border-color: var(--color-muted);
+}
+
+/* El desplazamiento es del cuerpo, no de la pagina: `overscroll-behavior`
+   impide que al llegar al final el gesto se lo lleve el fondo. */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-4);
+  /* En un movil con gestos, el ultimo boton no puede caer bajo la barra. */
+  padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+}
