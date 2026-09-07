@@ -1,0 +1,45 @@
+/* La tarjeta la pone `ui/Card`. Una sola fila que envuelve cuando no cabe: el texto ocupa lo que puede y el
+   boton conserva su objetivo tactil. Misma regla que las filas de dispositivos. */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.text {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  flex: 1 1 14rem;
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+.dot {
+  flex: none;
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-muted);
+}
+
+/* Latido: el estado "en marcha" tambien se ve sin leer. Se apaga cuando el
+   sistema pide menos movimiento. */
+.running {
+  background-color: var(--color-accent);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .running {
+    animation: none;
+  }
+}
