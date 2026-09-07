@@ -1,0 +1,22 @@
+/* La tarjeta la pone `ui/Card`; esta sigue viviendo en la zona del pulgar
+   porque activar una escena es lo que se hace a diario y, con el movil en una
+   mano, tiene que caer donde llega el dedo. */
+.narration {
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+/* Envuelven en varias lineas antes que encogerse: un objetivo tactil no se
+   negocia. */
+.tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.badge {
+  opacity: var(--opacity-muted);
+}
