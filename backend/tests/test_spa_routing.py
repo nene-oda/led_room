@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from pathlib import Path
+
+import pytest
 from fastapi.testclient import TestClient
 
 from backend.app.config import Settings
@@ -56,6 +59,42 @@ def test_archivo_de_raiz_no_cae_en_el_fallback(settings_with_spa: Settings) -> N
 
     assert response.status_code == 200
     assert "<!doctype html>" not in response.text.lower()
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "/../pyproject.toml",
+        "/../../etc/passwd",
+        "/assets/../../pyproject.toml",
+        "/%2e%2e/pyproject.toml",
+        "/..%2Fpyproject.toml",
+    ],
+)
+def test_ningun_recorrido_de_rutas_escapa_del_directorio_del_spa(
+    settings_with_spa: Settings, tmp_path: Path, path: str
+) -> None:
+    """El catch-all resuelve archivos reales: sin la comprobacion de contencion
+    serviria cualquier cosa del disco.
+
+    El codigo ya lo hace bien (`candidate.is_relative_to(root)`), y justo por eso
+    conviene fijarlo: la guarda es una linea facil de perder en un refactor y su
+    ausencia no rompe ningun otro test.
+    """
+    secreto = tmp_path / "secreto.txt"
+    secreto.write_text("no debe salir de aqui", encoding="utf-8")
+
+    with TestClient(create_app(settings_with_spa)) as client:
+        response = client.get(path)
+        fuera = client.get(f"/../{secreto.name}")
+
+    for served in (response, fuera):
+        # O 404, o el index del SPA: nunca el contenido de un archivo de fuera.
+        assert served.status_code in (200, 404)
+        assert "no debe salir de aqui" not in served.text
+        assert "led-room-backend" not in served.text
+        if served.status_code == 200:
+            assert "<!doctype html>" in served.text.lower()
 
 
 def test_sin_frontend_arranca_en_modo_solo_api(settings_without_spa: Settings) -> None:
