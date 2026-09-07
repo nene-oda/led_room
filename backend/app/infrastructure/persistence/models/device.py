@@ -15,7 +15,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 from uuid import UUID, uuid4
 
-from sqlalchemy import CheckConstraint
+from sqlalchemy import CheckConstraint, Index
 from sqlmodel import Field, Relationship, SQLModel
 
 from backend.app.infrastructure.persistence.models.base import UtcDateTime, utc_now
@@ -29,6 +29,19 @@ class DeviceRecord(SQLModel, table=True):
     """Un controlador fisico conocido por el sistema."""
 
     __tablename__ = "devices"
+
+    __table_args__ = (
+        # El mismo controlador fisico no puede registrarse dos veces: dos
+        # escaneos devuelven la misma direccion y `POST /devices` crearia un
+        # duplicado que dejaria ambiguo `get_by_address`. Es un INDICE unico y
+        # no un UniqueConstraint a proposito: `CREATE UNIQUE INDEX` es nativo en
+        # SQLite y evita la recreacion de tabla del modo batch, arriesgada aqui
+        # porque `device_capabilities`, `device_state` y `scene_targets` apuntan
+        # a esta tabla con las claves foraneas ACTIVADAS.
+        # En SQLite los NULL son distintos entre si, asi que varios dispositivos
+        # sin direccion (el adaptador nulo) siguen conviviendo.
+        Index("uq_devices_adapter_type_ble_address", "adapter_type", "ble_address", unique=True),
+    )
 
     id: UUID = Field(default_factory=uuid4, primary_key=True)
 

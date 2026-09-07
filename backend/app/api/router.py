@@ -8,11 +8,16 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
-from backend.app.api import health
+from backend.app.api import devices, effects, health, lights, profiles, scenes, state, system
 
 API_PREFIX = "/api/v1"
 
 api_router = APIRouter(prefix=API_PREFIX)
 api_router.include_router(health.router)
-
-# Fase 2: devices, lights | Fase 5: effects | Fase 6: scenes | Fase 7: profiles
+api_router.include_router(devices.router)
+api_router.include_router(effects.router)
+api_router.include_router(lights.router)
+api_router.include_router(profiles.router)
+api_router.include_router(scenes.router)
+api_router.include_router(state.router)
+api_router.include_router(system.router)

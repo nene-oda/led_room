@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -32,8 +33,17 @@ def settings_without_spa(tmp_path: Path) -> Settings:
 
 @pytest.fixture(autouse=True)
 def _isolate_env(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
-    """Evita que un .env o variables del host contaminen los tests."""
-    for name in list(dict(__import__("os").environ)):
+    """Evita que un .env o variables del host contaminen los tests.
+
+    Limpiar el entorno no basta: `Settings.model_config` declara
+    `env_file=".env"` y pytest corre desde la raiz del repositorio, asi que con
+    un `.env` de desarrollo presente `Settings()` leia, por ejemplo,
+    `LED_ROOM_DEVICE_ADAPTER=lotus_lantern` y la suite fallaba con un
+    `NotImplementedError` sin relacion aparente con el test.
+    """
+    for name in list(os.environ):
         if name.startswith("LED_ROOM_"):
             monkeypatch.delenv(name, raising=False)
+
+    monkeypatch.setitem(Settings.model_config, "env_file", None)
     yield

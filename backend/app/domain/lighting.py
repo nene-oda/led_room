@@ -8,15 +8,22 @@ aqui evita que `devices` acabe importando `effects`.
 from __future__ import annotations
 
 import re
+from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field
 
 _HEX_RE = re.compile(r"^#?([0-9a-fA-F]{6})$")
 
 #: Brillo minimo y maximo. El dominio y la API trabajan SIEMPRE en porcentaje;
-#: la escala del hardware es asunto exclusivo del adaptador. Ver design.md D3.
+#: la escala del hardware es asunto exclusivo del adaptador (ARCHITECTURE 3.3).
 BRIGHTNESS_MIN = 0
 BRIGHTNESS_MAX = 100
+
+#: UNICA definicion del entero 0-100 del dominio. Cualquier campo que sea un
+#: porcentaje (brillo de un fotograma, del estado, de un limite de perfil) se
+#: anota con este alias: repetir `Field(ge=0, le=100)` en cada modelo garantiza
+#: que algun dia uno de ellos acepte 101.
+Percent = Annotated[int, Field(ge=BRIGHTNESS_MIN, le=BRIGHTNESS_MAX)]
 
 
 class RGBColor(BaseModel):
@@ -56,5 +63,21 @@ class LightFrame(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     color: RGBColor
-    brightness: int = Field(ge=BRIGHTNESS_MIN, le=BRIGHTNESS_MAX)
+    brightness: Percent
     duration_ms: int = Field(gt=0)
+
+
+class LightState(BaseModel):
+    """Estado deseado de la luz: lo que el usuario pidio por ultima vez.
+
+    No es una lectura del hardware. El adaptador es un sumidero: no se le
+    consulta el estado (NEXT_STEPS A4). Los valores por defecto coinciden a
+    proposito con los de `DeviceStateRecord`, para que hidratar desde una base
+    vacia y arrancar sin base den exactamente el mismo estado.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    power: bool = False
+    color: RGBColor = RGBColor(r=255, g=255, b=255)
+    brightness: Percent = 100
