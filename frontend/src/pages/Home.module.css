@@ -1,0 +1,52 @@
+/* La pantalla se centra y crece hasta un ancho de escritorio comodo. El mismo
+   arbol sirve para movil y escritorio: no hay dos jerarquias que mantener. */
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 64rem;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4) calc(var(--space-5) + env(safe-area-inset-bottom));
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.header h1 {
+  margin: 0;
+}
+
+/* Rejilla de tarjetas de gestion.
+ *
+ * `auto-fit` + `minmax` es lo que sustituye a los puntos de ruptura: el
+ * navegador mete tantas columnas como quepan de 16rem y baja a una sola cuando
+ * no cabe ninguna mas, que es lo que pasa en un movil. No hay ni una media
+ * query de ancho en toda la pantalla.
+ *
+ * `align-items: start` para que una tarjeta corta no se estire hasta la altura
+ * de la mas alta de su fila y quede medio vacia. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  align-items: start;
+  gap: var(--space-4);
+}
+
+/* Lo que se usa a diario, al final de la pagina: `margin-top: auto` lo empuja
+   al tercio inferior cuando sobra alto, que es donde llega el pulgar con el
+   movil en una mano.
+ *
+ * Columnas mas anchas que las de arriba: aqui hay controles que se arrastran
+ * (el selector de color, el brillo) y estrecharlos los hace imprecisos. */
+.thumbZone {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+  align-items: start;
+  gap: var(--space-4);
+  margin-top: auto;
+}
