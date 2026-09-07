@@ -1,0 +1,57 @@
+/* El contenedor, el titulo y el borde los pone `ui/Card`; aqui solo estan las
+   señales. */
+.signals {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.signal {
+  display: grid;
+  grid-template-columns: auto 7rem 1fr;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.875rem;
+}
+
+/* El punto acompaña al texto, no lo sustituye: el color por si solo no es una
+   señal accesible (WCAG 1.4.1) y aqui hay tres estados que distinguir. */
+.dot {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-pill);
+  background-color: currentColor;
+}
+
+.ok {
+  color: var(--color-ok);
+}
+
+.warn {
+  color: var(--color-accent);
+}
+
+.error {
+  color: var(--color-danger);
+}
+
+.idle {
+  opacity: var(--opacity-muted);
+}
+
+.label {
+  opacity: var(--opacity-muted);
+}
+
+.text {
+  font-variant-numeric: tabular-nums;
+}
+
+.lastError {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-danger);
+}

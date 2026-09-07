@@ -1,0 +1,93 @@
+/* Solo lo que es **propio del descubrimiento**: la barra del escaneo, la
+   direccion y la señal.
+ *
+ * Las filas, la lista y los textos de narracion son el mismo cromo de catalogo
+ * que usan efectos, escenas y perfiles, y viven una sola vez en
+ * `ui/catalog.module.css`. */
+
+/* Carril de la barra. Lo que va dentro cambia de significado: `.fill` mide el
+   tiempo transcurrido contra el maximo que declara el servidor, y `.sweep` solo
+   dice "sigo trabajando" cuando ese maximo ya se ha superado y no queda
+   porcentaje honesto que enseñar. */
+.progress {
+  overflow: hidden;
+  height: var(--space-1);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-muted);
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-accent);
+  /* El valor salta de segundo en segundo; la transicion cubre ese hueco. Con
+     `prefers-reduced-motion` el token vale 0ms y la barra avanza a saltos, que
+     sigue siendo legible y no mueve nada de forma continua. */
+  transition: width var(--duration-tick) linear;
+}
+
+.sweep {
+  display: block;
+  width: 40%;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-accent);
+  animation: sweep 1.4s ease-in-out infinite;
+}
+
+@keyframes sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sweep {
+    width: 100%;
+    animation: none;
+  }
+}
+
+.address {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.signal {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 1px;
+  height: 0.75rem;
+}
+
+.bar {
+  width: 3px;
+  height: 33%;
+  background-color: currentColor;
+  opacity: var(--opacity-disabled);
+}
+
+.bar:nth-child(2) {
+  height: 66%;
+}
+
+.bar:nth-child(3) {
+  height: 100%;
+}
+
+.on {
+  opacity: 1;
+}
+
+.rssi {
+  font-variant-numeric: tabular-nums;
+}

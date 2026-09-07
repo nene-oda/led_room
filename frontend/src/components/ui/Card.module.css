@@ -1,0 +1,45 @@
+/* Cromo de la tarjeta. Unica definicion para las nueve de la pantalla: hereda
+   el borde y el radio del antiguo `Panel`, que se borro al desaparecer el
+   plegado. Todos los valores salen de los tokens de index.css. */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-muted);
+  border-radius: var(--radius-md);
+}
+
+/* El resumen se coloca junto al titulo y se descuelga debajo cuando no cabe:
+   en un movil estrecho, encogerlo lo dejaria ilegible. */
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
+}
+
+/* El titulo de la tarjeta pisa el estilo global de `h2` (versalitas pequeñas):
+   ese sigue siendo el de los subtitulos que van DENTRO de una tarjeta, y asi se
+   distingue el nivel de la tarjeta del de sus secciones. */
+.title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: normal;
+  opacity: 1;
+}
+
+.summary {
+  margin: 0;
+  font-size: 0.8125rem;
+  opacity: var(--opacity-muted);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}

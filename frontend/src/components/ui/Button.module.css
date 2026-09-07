@@ -1,0 +1,27 @@
+.button {
+  min-height: var(--touch-target);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-muted);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
+}
+
+.button[aria-busy='true'] {
+  cursor: progress;
+}
+
+/* Lo que esta puesto ahora mismo. Se distingue por el borde y no solo por el
+   texto: el color por si solo no basta, y el texto por si solo se pierde entre
+   varios botones iguales. */
+.button[aria-current='true'] {
+  border-color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px var(--color-accent);
+}

@@ -1,0 +1,35 @@
+.presets {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* auto-fill con un minimo de 44px: la rejilla se adapta al ancho sin un arbol
+   de componentes distinto para movil y escritorio. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--touch-target), 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.swatch {
+  width: 100%;
+  min-width: var(--touch-target);
+  min-height: var(--touch-target);
+  border: 1px solid var(--color-muted);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.swatch:disabled {
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
+}
+
+.swatch[aria-pressed='true'] {
+  outline: var(--focus-width) solid var(--color-text);
+  outline-offset: var(--focus-offset);
+}

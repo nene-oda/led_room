@@ -1,0 +1,48 @@
+/* Solo lo que es **propio de los efectos**.
+ *
+ * El cromo de la lista (filas, metadatos, acciones) y el del editor (campos,
+ * ayudas) viven en `ui/catalog.module.css`, que comparten las cuatro
+ * bibliotecas. Aqui estaban copiados clase por clase; con el cuarto duplicado
+ * se rompio el empate y se borraron. */
+
+/* Vista previa de la paleta: colores en el orden del ciclo. Decorativa. */
+.paletteStrip {
+  display: flex;
+  gap: 2px;
+}
+
+.chip {
+  width: var(--space-4);
+  height: var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.palette {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Objetivo tactil completo: en un movil se pulsa con el pulgar igual que los
+   colores rapidos. */
+.swatch {
+  width: var(--touch-target);
+  height: var(--touch-target);
+  border: 1px solid var(--color-muted);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.swatch[aria-pressed='true'] {
+  outline: var(--focus-width) solid currentColor;
+  outline-offset: var(--focus-offset);
+}
