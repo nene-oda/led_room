@@ -1,53 +1,18 @@
-import { useEffect, useState } from 'react'
-
-import { apiClient } from './api/client'
+import { Home } from './pages/Home'
+import { LightStateProvider } from './state/LightStateProvider'
 
 /**
- * Union discriminada en vez de varios booleanos: fija el patron con el que se
- * modelara despues el estado del dispositivo (disconnected / connecting /
- * connected / error).
+ * Raiz de la aplicacion: proveedor + pantalla.
+ *
+ * El proveedor esta aqui y no dentro de `Home` para que sea evidente que hay
+ * **uno solo**: una unica conexion WebSocket y un unico estado compartido para
+ * toda la aplicacion. Cuando llegue una segunda pantalla (Fases 6-7), el router
+ * se montara debajo de este proveedor, no encima.
  */
-type BackendState =
-  | { kind: 'loading' }
-  | { kind: 'ok'; status: string }
-  | { kind: 'error'; message: string }
-
 export function App() {
-  const [state, setState] = useState<BackendState>({ kind: 'loading' })
-
-  useEffect(() => {
-    let cancelled = false
-
-    apiClient
-      .getHealth()
-      .then((health) => {
-        if (!cancelled) setState({ kind: 'ok', status: health.status })
-      })
-      .catch((error: unknown) => {
-        if (!cancelled) {
-          setState({
-            kind: 'error',
-            message: error instanceof Error ? error.message : 'Error desconocido',
-          })
-        }
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
   return (
-    <main className="app">
-      <h1>LED Room</h1>
-      <section aria-labelledby="backend-heading">
-        <h2 id="backend-heading">Backend</h2>
-        <p className={`status status--${state.kind}`} role="status" aria-live="polite">
-          {state.kind === 'loading' && 'Comprobando /api/v1/health…'}
-          {state.kind === 'ok' && `Conectado — status: ${state.status}`}
-          {state.kind === 'error' && `Sin conexión — ${state.message}`}
-        </p>
-      </section>
-    </main>
+    <LightStateProvider>
+      <Home />
+    </LightStateProvider>
   )
 }
