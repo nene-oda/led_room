@@ -27,6 +27,14 @@ class EffectRecord(SQLModel, table=True):
         CheckConstraint("speed >= 0 AND speed <= 100", name="ck_effects_speed"),
         CheckConstraint("fps >= 1 AND fps <= 60", name="ck_effects_fps"),
         CheckConstraint("transition_ms >= 0", name="ck_effects_transition_ms"),
+        CheckConstraint(
+            "min_brightness IS NULL OR (min_brightness >= 0 AND min_brightness <= 100)",
+            name="ck_effects_min_brightness",
+        ),
+        CheckConstraint(
+            "max_brightness IS NULL OR (max_brightness >= 0 AND max_brightness <= 100)",
+            name="ck_effects_max_brightness",
+        ),
     )
 
     id: UUID = Field(default_factory=uuid4, primary_key=True)
@@ -42,6 +50,12 @@ class EffectRecord(SQLModel, table=True):
     #: sensato son 10-20 fps.
     fps: int = Field(default=20, ge=1, le=60)
     transition_ms: int = Field(default=1000, ge=0)
+
+    #: Envolvente de brillo de PULSE y BREATH. NULL = "usa la del dominio"
+    #: (0-100), no "usa cero". No se puede expresar con `effect_steps.brightness`,
+    #: que es el brillo de UN vertice (migracion 9c1d2b7e4a30).
+    min_brightness: Optional[int] = Field(default=None, ge=0, le=100)  # noqa: UP045
+    max_brightness: Optional[int] = Field(default=None, ge=0, le=100)  # noqa: UP045
 
     is_builtin: bool = Field(default=False)
 
